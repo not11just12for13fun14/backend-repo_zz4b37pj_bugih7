@@ -1,15 +1,19 @@
 INFO:     Will watch for changes in these directories: ['/home/workspace']
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [583] using StatReload
-INFO:     Started server process [585]
+INFO:     Started reloader process [905] using StatReload
+INFO:     Started server process [907]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     172.20.0.1:46430 - "HEAD / HTTP/1.1" 405 Method Not Allowed
-INFO:     172.20.0.1:46454 - "GET /products HTTP/1.1" 200 OK
-INFO:     172.20.0.1:46442 - "GET /categories HTTP/1.1" 200 OK
-INFO:     172.20.0.1:46454 - "GET /products HTTP/1.1" 200 OK
-INFO:     172.20.0.1:46442 - "GET /categories HTTP/1.1" 200 OK
-INFO:     172.20.0.1:45394 - "GET /categories HTTP/1.1" 200 OK
-INFO:     172.20.0.1:45410 - "GET /products HTTP/1.1" 200 OK
-INFO:     172.20.0.1:45394 - "GET /categories HTTP/1.1" 200 OK
-INFO:     172.20.0.1:45410 - "GET /products HTTP/1.1" 200 OK
+INFO:     172.20.0.1:53950 - "HEAD / HTTP/1.1" 405 Method Not Allowed
+INFO:     172.20.0.1:53964 - "GET /settings/qris HTTP/1.1" 200 OK
+INFO:     172.20.0.1:53972 - "GET /products HTTP/1.1" 200 OK
+INFO:     172.20.0.1:54004 - "GET /products HTTP/1.1" 200 OK
+INFO:     172.20.0.1:54020 - "GET /categories HTTP/1.1" 200 OK
+INFO:     172.20.0.1:53964 - "GET /settings/qris HTTP/1.1" 200 OK
+INFO:     172.20.0.1:53972 - "GET /products HTTP/1.1" 200 OK
+INFO:     172.20.0.1:54004 - "GET /products HTTP/1.1" 200 OK
+INFO:     172.20.0.1:54020 - "GET /categories HTTP/1.1" 200 OK
+INFO:     172.20.0.1:53984 - "GET /categories HTTP/1.1" 200 OK
+INFO:     172.20.0.1:53998 - "GET /settings/qris HTTP/1.1" 200 OK
+INFO:     172.20.0.1:53984 - "GET /categories HTTP/1.1" 200 OK
+INFO:     172.20.0.1:53998 - "GET /settings/qris HTTP/1.1" 200 OK

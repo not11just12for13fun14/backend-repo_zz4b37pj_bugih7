@@ -11,72 +11,57 @@ Model name is converted to lowercase for the collection name:
 - BlogPost -> "blogs" collection
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import Optional, List
 
-# Example schemas (replace with your own):
-
-class User(BaseModel):
-    """
-    Users collection schema
-    Collection name: "user" (lowercase of class name)
-    """
-    name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
-    address: str = Field(..., description="Address")
-    age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
-    is_active: bool = Field(True, description="Whether user is active")
+class AuthUser(BaseModel):
+    email: EmailStr
+    name: str
+    password_hash: str
+    role: str = Field("user", description="user | admin")
+    balance: int = Field(0, ge=0, description="GreenPay wallet balance in IDR")
+    is_active: bool = True
 
 class Category(BaseModel):
-    """
-    Categories for products
-    Collection name: "category"
-    """
     name: str = Field(..., description="Category display name")
     slug: str = Field(..., description="URL-friendly unique slug")
     icon: Optional[str] = Field(None, description="Optional icon name")
 
 class Product(BaseModel):
-    """
-    Products collection schema
-    Collection name: "product" (lowercase of class name)
-    """
     title: str = Field(..., description="Product title")
     description: Optional[str] = Field(None, description="Product description")
-    price: float = Field(..., ge=0, description="Price in dollars")
+    price: float = Field(..., ge=0, description="Price in rupiah")
     category: str = Field(..., description="Product category slug")
     in_stock: bool = Field(True, description="Whether product is in stock")
-    image: Optional[str] = Field(None, description="Image URL")
+    image: Optional[str] = Field(None, description="Stored image path or data URI")
     rating: Optional[float] = Field(4.5, ge=0, le=5, description="Average rating")
 
 class OrderItem(BaseModel):
-    product_id: str = Field(..., description="ID of the product")
-    title: str = Field(..., description="Product title at purchase time")
-    price: float = Field(..., ge=0, description="Unit price at purchase time")
-    quantity: int = Field(..., ge=1, description="Quantity ordered")
+    product_id: str
+    title: str
+    price: float
+    quantity: int = Field(..., ge=1)
     image: Optional[str] = None
 
 class Order(BaseModel):
-    """
-    Orders collection schema
-    Collection name: "order"
-    """
+    buyer_id: Optional[str] = None
     buyer_name: str
     buyer_email: str
     buyer_address: str
     items: List[OrderItem]
     subtotal: float
-    discount: float = Field(0, ge=0, description="Discount applied in currency")
+    discount: float = Field(0, ge=0)
     delivery_fee: float
     total: float
-    status: str = Field("pending", description="Order status")
-    coupon_code: Optional[str] = Field(None, description="Applied coupon code, if any")
+    status: str = Field("pending")
+    coupon_code: Optional[str] = None
+    payment_method: Optional[str] = None
 
-# Add your own schemas here:
-# --------------------------------------------------
+class WalletTopup(BaseModel):
+    amount: int = Field(..., ge=1000, description="Top up amount in IDR")
+    via: str = Field("qris", description="Top up method: qris")
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class WalletPayment(BaseModel):
+    amount: int = Field(..., ge=1)
+    description: Optional[str] = None
+
