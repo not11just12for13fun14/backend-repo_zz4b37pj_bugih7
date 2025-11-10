@@ -1,6 +1,6 @@
 import os
 from typing import List, Optional
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from bson import ObjectId
@@ -51,10 +51,14 @@ def list_categories():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/categories")
-def create_category(category: Category):
+def create_category(category: Category, x_role: Optional[str] = Header(default=None)):
     try:
+        if (x_role or "").lower() != "admin":
+            raise HTTPException(status_code=403, detail="Forbidden: admin role required")
         inserted_id = create_document("category", category)
         return {"_id": inserted_id}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -74,10 +78,14 @@ def list_products(category: Optional[str] = None, q: Optional[str] = None):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/products")
-def create_product(product: ProductIn):
+def create_product(product: ProductIn, x_role: Optional[str] = Header(default=None)):
     try:
+        if (x_role or "").lower() != "admin":
+            raise HTTPException(status_code=403, detail="Forbidden: admin role required")
         inserted_id = create_document("product", product)
         return {"_id": inserted_id}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

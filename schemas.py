@@ -66,9 +66,11 @@ class Order(BaseModel):
     buyer_address: str
     items: List[OrderItem]
     subtotal: float
+    discount: float = Field(0, ge=0, description="Discount applied in currency")
     delivery_fee: float
     total: float
     status: str = Field("pending", description="Order status")
+    coupon_code: Optional[str] = Field(None, description="Applied coupon code, if any")
 
 # Add your own schemas here:
 # --------------------------------------------------
