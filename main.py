@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import FastAPI, HTTPException, Header, UploadFile, File, Form, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 from bson import ObjectId
@@ -250,6 +251,147 @@ def create_order(order: Order, authorization: Optional[str] = Header(default=Non
             doc["buyer_id"] = str(buyer["_id"])
         inserted_id = create_document("order", doc)
         return {"_id": inserted_id, "status": doc.get("status", "received")}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/orders/{order_id}")
+def get_order(order_id: str):
+    try:
+        row = db["order"].find_one({"_id": ObjectId(order_id)})
+        if not row:
+            raise HTTPException(status_code=404, detail="Order not found")
+        row["_id"] = str(row["_id"])
+        return row
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/orders/{order_id}/invoice", response_class=HTMLResponse)
+def get_order_invoice(order_id: str):
+    try:
+        order = db["order"].find_one({"_id": ObjectId(order_id)})
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        created_at = order.get("created_at")
+        created_str = created_at.strftime("%d %b %Y %H:%M") if created_at else ""
+        buyer_name = order.get("buyer_name")
+        buyer_email = order.get("buyer_email")
+        buyer_address = order.get("buyer_address")
+        status = order.get("status", "pending").upper()
+        coupon = order.get("coupon_code") or "-"
+        subtotal = int(round(order.get("subtotal", 0)))
+        discount = int(round(order.get("discount", 0)))
+        delivery = int(round(order.get("delivery_fee", 0)))
+        total = int(round(order.get("total", 0)))
+        def rp(x: int) -> str:
+            return f"Rp{int(x):,}".replace(",", ".")
+        rows_html = "".join([
+            f"""
+            <tr>
+              <td style='padding:8px;border-bottom:1px solid #eee'>#{i+1}</td>
+              <td style='padding:8px;border-bottom:1px solid #eee'>{item.get('title')}</td>
+              <td style='padding:8px;border-bottom:1px solid #eee'>{int(item.get('quantity',1))}</td>
+              <td style='padding:8px;border-bottom:1px solid #eee;text-align:right'>{rp(int(item.get('price',0)))}</td>
+              <td style='padding:8px;border-bottom:1px solid #eee;text-align:right'>{rp(int(item.get('price',0))*int(item.get('quantity',1)))}</td>
+            </tr>
+            """
+            for i, item in enumerate(order.get("items", []))
+        ])
+        html = f"""
+        <!doctype html>
+        <html>
+        <head>
+          <meta charset='utf-8'/>
+          <meta name='viewport' content='width=device-width, initial-scale=1'/>
+          <title>Faktur #{order_id} - GreenFood</title>
+        </head>
+        <body style='font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:#f8fafc;padding:24px'>
+          <div style='max-width:840px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden'>
+            <div style='display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:#ecfdf5;border-bottom:1px solid #e5e7eb'>
+              <div>
+                <div style='font-size:20px;font-weight:700;color:#065f46'>GreenFood</div>
+                <div style='color:#065f46'>Faktur Pembayaran</div>
+              </div>
+              <div style='text-align:right'>
+                <div style='font-size:12px;color:#047857'>Status</div>
+                <div style='font-weight:700;color:#065f46'>{status}</div>
+              </div>
+            </div>
+            <div style='padding:20px 24px'>
+              <div style='display:flex;gap:24px;flex-wrap:wrap'>
+                <div style='flex:1;min-width:240px'>
+                  <div style='font-size:12px;color:#6b7280'>Nomor Faktur</div>
+                  <div style='font-weight:600'>{order_id}</div>
+                </div>
+                <div style='flex:1;min-width:240px'>
+                  <div style='font-size:12px;color:#6b7280'>Tanggal</div>
+                  <div style='font-weight:600'>{created_str}</div>
+                </div>
+              </div>
+
+              <div style='margin-top:16px;display:flex;gap:24px;flex-wrap:wrap'>
+                <div style='flex:1;min-width:240px'>
+                  <div style='font-size:12px;color:#6b7280'>Pembeli</div>
+                  <div style='font-weight:600'>{buyer_name}</div>
+                  <div style='font-size:12px;color:#6b7280'>{buyer_email}</div>
+                </div>
+                <div style='flex:1;min-width:240px'>
+                  <div style='font-size:12px;color:#6b7280'>Alamat</div>
+                  <div style='font-weight:600'>{buyer_address}</div>
+                </div>
+              </div>
+
+              <table style='width:100%;margin-top:24px;border-collapse:collapse'>
+                <thead>
+                  <tr>
+                    <th style='text-align:left;padding:8px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:12px'>No</th>
+                    <th style='text-align:left;padding:8px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:12px'>Produk</th>
+                    <th style='text-align:left;padding:8px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:12px'>Qty</th>
+                    <th style='text-align:right;padding:8px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:12px'>Harga</th>
+                    <th style='text-align:right;padding:8px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-size:12px'>Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows_html}
+                </tbody>
+              </table>
+
+              <div style='margin-top:24px;display:flex;justify-content:flex-end'>
+                <div style='width:320px'>
+                  <div style='display:flex;justify-content:space-between;padding:8px 0'>
+                    <div style='color:#6b7280'>Subtotal</div>
+                    <div style='font-weight:600'>{rp(subtotal)}</div>
+                  </div>
+                  <div style='display:flex;justify-content:space-between;padding:8px 0'>
+                    <div style='color:#6b7280'>Diskon {coupon if coupon else ''}</div>
+                    <div style='font-weight:600'>- {rp(discount)}</div>
+                  </div>
+                  <div style='display:flex;justify-content:space-between;padding:8px 0'>
+                    <div style='color:#6b7280'>Ongkir</div>
+                    <div style='font-weight:600'>{rp(delivery)}</div>
+                  </div>
+                  <div style='height:1px;background:#e5e7eb;margin:6px 0'></div>
+                  <div style='display:flex;justify-content:space-between;padding:8px 0'>
+                    <div style='font-weight:700'>Total</div>
+                    <div style='font-weight:700;color:#065f46'>{rp(total)}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style='margin-top:16px;font-size:12px;color:#6b7280'>
+                Terima kasih telah berbelanja di GreenFood. Simpan halaman ini sebagai bukti pembayaran.
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+        """
+        return HTMLResponse(content=html)
     except HTTPException:
         raise
     except Exception as e:

@@ -1,19 +1,19 @@
 INFO:     Will watch for changes in these directories: ['/home/workspace']
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [905] using StatReload
-INFO:     Started server process [907]
+INFO:     Started reloader process [964] using StatReload
+INFO:     Started server process [966]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
-INFO:     172.20.0.1:53950 - "HEAD / HTTP/1.1" 405 Method Not Allowed
-INFO:     172.20.0.1:53964 - "GET /settings/qris HTTP/1.1" 200 OK
-INFO:     172.20.0.1:53972 - "GET /products HTTP/1.1" 200 OK
-INFO:     172.20.0.1:54004 - "GET /products HTTP/1.1" 200 OK
-INFO:     172.20.0.1:54020 - "GET /categories HTTP/1.1" 200 OK
-INFO:     172.20.0.1:53964 - "GET /settings/qris HTTP/1.1" 200 OK
-INFO:     172.20.0.1:53972 - "GET /products HTTP/1.1" 200 OK
-INFO:     172.20.0.1:54004 - "GET /products HTTP/1.1" 200 OK
-INFO:     172.20.0.1:54020 - "GET /categories HTTP/1.1" 200 OK
-INFO:     172.20.0.1:53984 - "GET /categories HTTP/1.1" 200 OK
-INFO:     172.20.0.1:53998 - "GET /settings/qris HTTP/1.1" 200 OK
-INFO:     172.20.0.1:53984 - "GET /categories HTTP/1.1" 200 OK
-INFO:     172.20.0.1:53998 - "GET /settings/qris HTTP/1.1" 200 OK
+INFO:     172.20.0.1:43450 - "HEAD / HTTP/1.1" 405 Method Not Allowed
+INFO:     172.20.0.1:43464 - "GET /settings/qris HTTP/1.1" 200 OK
+INFO:     172.20.0.1:43478 - "GET /categories HTTP/1.1" 200 OK
+INFO:     172.20.0.1:43498 - "GET /products HTTP/1.1" 200 OK
+INFO:     172.20.0.1:43508 - "GET /categories HTTP/1.1" 200 OK
+INFO:     172.20.0.1:43464 - "GET /settings/qris HTTP/1.1" 200 OK
+INFO:     172.20.0.1:43478 - "GET /categories HTTP/1.1" 200 OK
+INFO:     172.20.0.1:43498 - "GET /products HTTP/1.1" 200 OK
+INFO:     172.20.0.1:43508 - "GET /categories HTTP/1.1" 200 OK
+INFO:     172.20.0.1:43490 - "GET /settings/qris HTTP/1.1" 200 OK
+INFO:     172.20.0.1:43482 - "GET /products HTTP/1.1" 200 OK
+INFO:     172.20.0.1:43508 - "GET /settings/qris HTTP/1.1" 200 OK
+INFO:     172.20.0.1:43482 - "GET /products HTTP/1.1" 200 OK
